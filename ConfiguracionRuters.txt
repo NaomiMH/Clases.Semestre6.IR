@@ -1,0 +1,104 @@
+Configuracion basica del router
++ Comando
+gtk Term
+
+- En caso de que no aparezca nada, presionar enter.
+
+Would you like to enter the initial configuration dialog? [yes/no]: no
+
+- En caso de equivocacion habra que reiniciar el router.
+
+= Modo privilegiado EXEC
+Router>enable
+Router#
+
+- Para salir de cada modo utilizar el comando exit.
+
++ Borrar configuracion
+Router#erase startup-config
+
+Router#reload
+- Si te pregunta algo de yes/no, responde no.
+
+= Modo configuracion global
+Router#configure terminal
+Router(config)#
+
++ Cambiar nombre del router
+Router(config)#hostname <nombre>
+
++ Desactivar la busqueda DNS
+R1(config)#no ip domain-lookup
+
++ Configuracion de contrasena de EXEC
+R1(config)#enable secret class
+
++ Banner
+R1(config)#banner motd &
+
+= Configuracion line
+R1(config)#line console 0
+
++ Contrasena del router
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+
++ Configuracion de contrasena de lineas virtuales
+R1(config)#line vty 0 4
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+
+- Con un rango de 0 4 se estan estableciendo 5 lineas virtuales
+
++ Ruteo de paquetes unicast IPv6
+R1(config)#ipv6 unicast-routing
+
+** R1
+
+= Configuracion de la interfaz Serial 0/0/0
+R1(config)#interface serial 0/0/0
+R1(config-if)#ipv6 address 2001:db8:c0ca::192.168.2.1/120
+R1(config-if)#ip address 192.168.2.1 255.255.255.0
+R1(config-if)#clock rate 64000
+R1(config-if)#no shutdown
+R1(config-if)#end
+
+= Fast ethernet 0/0
+R1(config)#interface fastethernet 0/0
+R1(config-if)#ipv6 address 2001:db8:c0ca::192.168.1.1/120
+R1(config-if)#ip address 192.168.1.1 255.255.255.0
+R1(config-if)#no shutdown
+
+= Fast Ethernet 0/1
+R1(config)#interface fastethernet 0/1
+R1(config-if)#ipv6 address 2001:db8:c0ca:cafe::1/64
+R1(config-if)#no shutdown
+
++ Guardar configuracion
+R1#copy running-config startup-config
+
+** R2
+
+= Configuracion de la interfaz Serial 0/0/0
+- La interfaz de R1 debe de ser programada primero.
+R2(config-if)#interface serial 0/0/0
+R2(config-if)#ipv6 address 2001:db8:c0ca::192.168.2.2/120
+R2(config-if)#ip address 192.168.2.2 255.255.255.0
+R2(config-if)#no shutdown
+
+- Saldran unas lineas que digan
+%LINK-5-CHANGED: Interface Serial0/0/0, changed state to up
+%LINEPROTO-5-UPDOWN: Line protocol on Interface Serial0/0/0, changed
+state to up
+- Esto significa que funciono.
+
+= Fast ethernet 0/0
+R2(config-if)#interface fastethernet 0/0
+R2(config-if)#ipv6 address 2001:db8:c0ca::192.168.3.1/120
+R2(config-if)#ip address 192.168.3.1 255.255.255.0
+R2(config-if)#no shutdown
+
++ Guardar configuracion
+R2#copy running-config startup-config
